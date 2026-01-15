@@ -1,0 +1,68 @@
+# go2rtc Configuration
+# Dokumentasi: https://github.com/AlexxIT/go2rtc
+
+# ===========================================
+# STREAMS - Tambahkan RTSP dari jaringan luar
+# ===========================================
+streams:
+  # Contoh RTSP dari IP publik/jaringan luar
+  # Ganti dengan URL RTSP kamera Anda
+  camera1: rtsp://username:password@IP_PUBLIK:554/stream1
+  
+  # Stream asli (untuk VLC/RTSP client)
+  camera2: rtsp://admin:2025cctvknw@36.93.71.28:4554/stream2
+  camera3: rtsp://admin:2025cctvknw@36.93.71.28:6554/stream2
+  
+  # Stream dengan transcoding untuk BROWSER (H.264)
+  # Gunakan ffmpeg untuk convert H.265 -> H.264
+  camera2_web: "ffmpeg:rtsp://admin:2025cctvknw@36.93.71.28:4554/stream2#video=h264#audio=aac"
+  camera3_web: "ffmpeg:rtsp://admin:2025cctvknw@36.93.71.28:6554/stream2#video=h264#audio=aac"
+  # Contoh lain dengan path berbeda
+  # camera2: rtsp://admin:admin123@203.0.113.50:554/cam/realmonitor?channel=1&subtype=0
+  
+  # RTSP dengan TCP transport (lebih stabil untuk jaringan luar)
+  # camera3: rtsp://user:pass@IP_PUBLIK:554/stream?transport=tcp
+
+# ===========================================
+# API - Web Interface
+# ===========================================
+api:
+  listen: ":1984"        # Web UI di port 1984
+  origin: "*"            # Izinkan akses dari semua origin
+
+# ===========================================
+# HLS - HTTP Live Streaming untuk akses luar
+# ===========================================
+hls:
+  # HLS akan otomatis tersedia di:
+  # http://IP_SERVER:1984/api/stream.m3u8?src=camera1
+
+# ===========================================
+# RTSP Server - Untuk re-streaming
+# ===========================================
+rtsp:
+  listen: ":8554"        # RTSP server di port 8554
+
+# ===========================================
+# WebRTC - Untuk streaming low-latency
+# ===========================================
+webrtc:
+  listen: ":8555/tcp"    # WebRTC port
+  candidates:
+    - stun:stun.l.google.com:19302  # STUN server untuk NAT traversal
+
+# ===========================================
+# CATATAN PENTING untuk akses dari luar:
+# ===========================================
+# 1. Pastikan port berikut dibuka di firewall/router:
+#    - 1984 (Web UI & HLS)
+#    - 8554 (RTSP)
+#    - 8555 (WebRTC)
+#
+# 2. Akses HLS dari luar:
+#    http://IP_PUBLIK_SERVER:1984/api/stream.m3u8?src=camera1
+#
+# 3. Akses Web UI dari luar:
+#    http://IP_PUBLIK_SERVER:1984
+#
+# 4. Untuk HTTPS, gunakan reverse proxy (nginx/caddy)
