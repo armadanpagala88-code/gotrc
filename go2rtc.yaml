@@ -1,93 +1,38 @@
-# go2rtc Configuration - OPTIMIZED for Multi-Viewer External Access
-# Dokumentasi: https://github.com/AlexxIT/go2rtc
-
-# ===========================================
-# STREAMS - RTSP dari jaringan luar
-# ===========================================
 streams:
-  # =====================
-  # LABKESDA (2 kamera)
-  # =====================
-  labkesda1: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:554/stream1#timeout=30"
-  labkesda2: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:555/stream1#timeout=30"
-  
-  # =====================
-  # SOSIAL/DINSOS (2 kamera)
-  # =====================
-  sosial1: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream1#timeout=30"
-  sosial2: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream1#timeout=30"
-  
-  # =====================
-  # ASAMBU (2 kamera)
-  # =====================
-  asambu1: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream1#timeout=30"
-  asambu2: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream1#timeout=30"
-  
-  # =====================
-  # KEL. UNAAHA (2 kamera)
-  # =====================
-  unaaha1: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream1#timeout=30"
-  unaaha2: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream1#timeout=30"
-  
-  # =====================
-  # PASAR ASINUA (2 kamera)
-  # =====================
-  pasar_asinua1: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream1#timeout=30"
-  pasar_asinua2: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream1#timeout=30"
-  
-  # =====================
-  # ASINUA (2 kamera)
-  # =====================
-  asinua1: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream1#timeout=30"
-  asinua2: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream1#timeout=30"
-  
-  # =====================
-  # INALAHI (2 kamera)
-  # =====================
-  inalahi1: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream1#timeout=30"
-  inalahi2: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream1#timeout=30"
+  labkesda1: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:554/stream2#timeout=30"
+  labkesda2: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:555/stream2#timeout=30"
+  sosial1: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream2#timeout=30"
+  sosial2: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream2#timeout=30"
+  asambu1: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream2#timeout=30"
+  asambu2: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream2#timeout=30"
+  unaaha1: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream2#timeout=30"
+  unaaha2: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream2#timeout=30"
+  pasar_asinua1: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream2#timeout=30"
+  pasar_asinua2: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream2#timeout=30"
+  asinua1: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream2#timeout=30"
+  asinua2: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream2#timeout=30"
+  inalahi1: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream2#timeout=30"
+  inalahi2: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream2#timeout=30"
 
-# ===========================================
-# FFmpeg - Minimal config
-# ===========================================
 ffmpeg:
-  bin: /opt/homebrew/bin/ffmpeg
+  bin: ffmpeg
 
-# ===========================================
-# API - Web Interface
-# ===========================================
 api:
   listen: ":1984"
   origin: "*"
+  static_dir: /config
 
-# ===========================================
-# RTSP Server
-# ===========================================
 rtsp:
   listen: ":8554"
-  # Default codec untuk kompatibilitas
-  default_query: "video&audio"
 
-# ===========================================
-# WebRTC - Low Latency Streaming
-# ===========================================
 webrtc:
   listen: ":8555/tcp"
   ice_servers:
     - urls: [stun:stun.l.google.com:19302]
-    - urls: [stun:stun1.l.google.com:19302]
 
-# ===========================================
-# HLS - HTTP Live Streaming (untuk banyak viewer)
-# ===========================================
 hls:
-  # Segment pendek untuk latency rendah
-  segment_duration: 1
-  # Playlist size untuk buffer
-  playlist_size: 3
+  segment_duration: 2
+  playlist_size: 5
 
-# ===========================================
-# Log level
-# ===========================================
 log:
   level: info

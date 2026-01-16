@@ -1,0 +1,12 @@
+services:
+  go2rtc:
+    image: alexxit/go2rtc:latest
+    container_name: go2rtc
+    restart: always
+    network_mode: host
+    volumes:
+      - ./go2rtc.yaml:/config/go2rtc.yaml:ro
+      - ./dashboard.html:/config/dashboard.html:ro
+      - ./vue-dashboard.html:/config/vue-dashboard.html:ro
+    environment:
+      - TZ=Asia/Makassar

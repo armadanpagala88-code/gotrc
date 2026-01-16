@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CCTV Dashboard</title>
+    <title>CCTV Dashboard - Diskominfo Kab. Konawe</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         * {
@@ -18,15 +19,103 @@
             background: #0a0a0a;
             min-height: 100vh;
             color: #fff;
-            overflow-x: hidden;
         }
 
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a1628 0%, #1a0a28 100%);
+        }
+
+        .login-box {
+            background: rgba(20, 20, 30, 0.9);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #2a2a3a;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            color: #0af;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #1a1a2a;
+            border: 1px solid #2a2a3a;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0af;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #0077aa, #00aadd);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid #f44;
+            color: #f88;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* Dashboard */
         .header {
             background: #111;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            border-bottom: 1px solid #1a1a1a;
             position: sticky;
             top: 0;
             z-index: 50;
@@ -35,17 +124,56 @@
         .marquee-bar {
             background: linear-gradient(90deg, #001a33 0%, #003366 50%, #001a33 100%);
             padding: 4px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .marquee-wrapper {
+            flex: 1;
             overflow: hidden;
             white-space: nowrap;
         }
 
         .marquee-content {
             display: inline-block;
-            animation: marquee 20s linear infinite;
+            animation: marquee 25s linear infinite;
             padding-left: 100%;
             font-size: 0.75rem;
             color: #0af;
-            font-weight: 500;
+        }
+
+        .clock-widget {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 15px;
+            border-left: 1px solid rgba(0, 170, 255, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+
+        .clock-time {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #0f0;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .clock-date {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            line-height: 1.1;
+        }
+
+        .clock-day {
+            font-size: 0.65rem;
+            color: #0af;
+            text-transform: uppercase;
+        }
+
+        .clock-fulldate {
+            font-size: 0.6rem;
+            color: #888;
         }
 
         @keyframes marquee {
@@ -62,30 +190,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
-            height: 42px;
+            padding: 6px 12px;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        .header h1 {
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
             font-size: 0.85rem;
             color: #0af;
         }
 
-        .header-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
         .layout-controls {
             display: flex;
-            gap: 2px;
+            gap: 3px;
         }
 
         .layout-btn,
         .action-btn {
-            padding: 5px 8px;
+            padding: 5px 10px;
             border: 1px solid #222;
             background: #151515;
             color: #666;
@@ -106,11 +233,29 @@
             border-color: #0077aa;
         }
 
-        .status-bar {
+        .header-right {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 0.65rem;
+        }
+
+        .datetime-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: 'Courier New', monospace;
+        }
+
+        .time-display {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #0af;
+            letter-spacing: 1px;
+        }
+
+        .date-display {
+            font-size: 0.6rem;
+            color: #666;
         }
 
         .live-indicator {
@@ -118,6 +263,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            font-size: 0.7rem;
         }
 
         .live-indicator::before {
@@ -129,8 +275,26 @@
             animation: pulse 2s infinite;
         }
 
-        .bandwidth-total {
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
             color: #888;
+        }
+
+        .logout-btn {
+            background: #2a1a1a;
+            border: 1px solid #3a2a2a;
+            color: #f88;
+            padding: 4px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.65rem;
+        }
+
+        .logout-btn:hover {
+            background: #3a2a2a;
         }
 
         @keyframes pulse {
@@ -170,25 +334,6 @@
             color: #444;
             margin: 10px 0 5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sidebar h3:first-child {
-            margin-top: 0;
-        }
-
-        .group-section {
-            margin-bottom: 15px;
-        }
-
-        .group-title {
-            font-size: 0.7rem;
-            color: #0af;
-            padding: 5px 8px;
-            background: #0a1520;
-            border-radius: 3px;
-            margin-bottom: 4px;
-            cursor: pointer;
         }
 
         .camera-list {
@@ -205,7 +350,6 @@
             cursor: pointer;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
         .camera-item:hover {
@@ -221,21 +365,6 @@
             border-left: 2px solid #600;
             background: #120a0a;
             opacity: 0.5;
-        }
-
-        .camera-item-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-
-        .camera-item-name {
-            color: #aaa;
-        }
-
-        .camera-item-bandwidth {
-            font-size: 0.55rem;
-            color: #555;
         }
 
         /* Main content */
@@ -289,14 +418,6 @@
             display: none;
         }
 
-        .camera-card.dragging {
-            opacity: 0.4;
-        }
-
-        .camera-card.drag-over {
-            border-color: #0af;
-        }
-
         .camera-overlay {
             position: absolute;
             top: 0;
@@ -306,7 +427,6 @@
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
             z-index: 10;
             opacity: 0;
             transition: opacity 0.2s;
@@ -314,12 +434,6 @@
 
         .camera-card:hover .camera-overlay {
             opacity: 1;
-        }
-
-        .overlay-left {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
         }
 
         .camera-name {
@@ -330,17 +444,6 @@
         .camera-group {
             font-size: 0.5rem;
             color: #0af;
-        }
-
-        .camera-bandwidth {
-            font-size: 0.5rem;
-            color: #555;
-        }
-
-        .overlay-right {
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
 
         .camera-status {
@@ -420,51 +523,43 @@
             color: #fff;
         }
 
-        .btn-snapshot {
-            background: rgba(0, 150, 255, 0.2);
-            color: #0af;
-        }
-
-        .btn-snapshot:hover {
-            background: rgba(0, 150, 255, 0.4);
-        }
-
-        /* Snapshot preview */
-        .snapshot-preview {
+        /* PTZ Controls */
+        .ptz-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            z-index: 100;
-            display: none;
-            max-width: 90vw;
-        }
-
-        .snapshot-preview.show {
-            display: block;
-        }
-
-        .snapshot-preview img {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 4px;
-        }
-
-        .snapshot-preview .actions {
-            margin-top: 10px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
-            gap: 8px;
+            align-items: center;
             justify-content: center;
+            z-index: 200;
         }
 
-        .snapshot-preview .close {
-            position: absolute;
-            top: 8px;
-            right: 12px;
+        .ptz-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+            min-width: 300px;
+        }
+
+        .ptz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .ptz-title {
+            color: #0af;
+            font-size: 0.9rem;
+        }
+
+        .ptz-close {
             background: none;
             border: none;
             color: #888;
@@ -472,37 +567,73 @@
             cursor: pointer;
         }
 
-        /* Mobile Responsive */
+        .ptz-close:hover {
+            color: #f44;
+        }
+
+        .ptz-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .ptz-btn {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ptz-btn:hover {
+            background: #0077aa;
+            border-color: #0af;
+        }
+
+        .ptz-btn:active {
+            transform: scale(0.95);
+        }
+
+        .ptz-btn.center {
+            background: #333;
+        }
+
+        .ptz-zoom {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .ptz-zoom-btn {
+            padding: 10px 25px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .ptz-zoom-btn:hover {
+            background: #0077aa;
+        }
+
+        /* Mobile */
         @media (max-width: 768px) {
-            .header {
-                padding: 5px 8px;
-                height: 38px;
-            }
-
-            .header h1 {
-                font-size: 0.75rem;
-            }
-
             .layout-controls {
                 display: none;
-            }
-
-            .action-btn span {
-                display: none;
-            }
-
-            .sidebar {
-                width: 180px;
-            }
-
-            .main-content.sidebar-open {
-                margin-right: 180px;
             }
 
             .grid {
                 grid-template-columns: 1fr !important;
                 grid-template-rows: auto !important;
-                gap: 2px;
             }
 
             .camera-card {
@@ -514,378 +645,506 @@
                 opacity: 1 !important;
             }
 
-            .btn {
-                padding: 6px 10px;
-                font-size: 0.7rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-controls {
-                gap: 4px;
-            }
-
-            .status-bar {
+            .user-info span {
                 display: none;
-            }
-
-            .sidebar {
-                width: 160px;
-            }
-
-            .main-content.sidebar-open {
-                margin-right: 160px;
             }
         }
     </style>
 </head>
 
 <body>
-    <header class="header">
-        <div class="marquee-bar">
-            <div class="marquee-content">🎥 CCTV Dinas Komunikasi dan Informatika Kab. Konawe
-                &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; Sistem Pemantauan CCTV Real-Time
-                &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; 🎥 CCTV Dinas Komunikasi dan Informatika Kab. Konawe
-                &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; Sistem Pemantauan CCTV Real-Time</div>
+    <div id="app">
+        <!-- Login Page -->
+        <div v-if="!isAuthenticated" class="login-container">
+            <div class="login-box">
+                <h1>🎥 CCTV Dashboard</h1>
+                <p class="subtitle">Dinas Komunikasi dan Informatika<br>Kabupaten Konawe</p>
+
+                <div v-if="loginError" class="error-msg">{{ loginError }}</div>
+
+                <form @submit.prevent="handleLogin">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" v-model="loginForm.username" placeholder="Masukkan username" required
+                            autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" v-model="loginForm.password" placeholder="Masukkan password" required
+                            autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="login-btn" :disabled="isLoading">
+                        {{ isLoading ? 'Memproses...' : 'Login' }}
+                    </button>
+                </form>
+            </div>
         </div>
-        <div class="header-main">
-            <h1>🎥 CCTV Dashboard</h1>
-            <div class="header-controls">
-                <div class="layout-controls">
-                    <button class="layout-btn" onclick="setLayout('1x1')">1×1</button>
-                    <button class="layout-btn active" onclick="setLayout('2x2')">2×2</button>
-                    <button class="layout-btn" onclick="setLayout('3x3')">3×3</button>
-                    <button class="layout-btn" onclick="setLayout('4x4')">4×4</button>
+
+        <!-- Dashboard -->
+        <div v-else>
+            <header class="header">
+                <div class="marquee-bar">
+                    <div class="marquee-wrapper">
+                        <div class="marquee-content">
+                            🎥 CCTV Dinas Komunikasi dan Informatika Kab. Konawe &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                            Sistem Pemantauan CCTV Real-Time &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;
+                            🎥 CCTV Dinas Komunikasi dan Informatika Kab. Konawe
+                        </div>
+                    </div>
+                    <div class="clock-widget">
+                        <span class="clock-time">{{ currentTime }}</span>
+                        <div class="clock-date">
+                            <span class="clock-day">{{ currentDay }}</span>
+                            <span class="clock-fulldate">{{ currentDate }}</span>
+                        </div>
+                    </div>
                 </div>
-                <button class="action-btn" onclick="toggleSidebar()">☰ <span>Menu</span></button>
+                <div class="header-main">
+                    <div class="header-left">
+                        <span class="header-title">🎥 CCTV Dashboard</span>
+                        <div class="layout-controls">
+                            <button v-for="l in layouts" :key="l" class="layout-btn" :class="{ active: layout === l }"
+                                @click="layout = l">{{ l }}</button>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <div class="datetime-display">
+                            <span class="time-display">{{ currentTime }}</span>
+                            <span class="date-display">{{ currentDate }}</span>
+                        </div>
+                        <span class="live-indicator">LIVE</span>
+                        <span style="color:#666;font-size:0.65rem">{{ totalBandwidth }}</span>
+                        <button class="action-btn" @click="sidebarOpen = !sidebarOpen">☰ Menu</button>
+                        <div class="user-info">
+                            <span>👤 {{ currentUser }}</span>
+                            <button class="logout-btn" @click="handleLogout">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="sidebar" :class="{ open: sidebarOpen }">
+                <h3>📊 Bandwidth</h3>
+                <div class="camera-list">
+                    <div v-for="cam in cameras" :key="cam.id" class="camera-item" :class="{ active: cam.visible }">
+                        <span>{{ cam.name }}</span>
+                        <span style="color:#666">{{ formatBw(cam.bandwidth) }}</span>
+                    </div>
+                </div>
+
+                <h3>📷 Kamera</h3>
+                <div class="camera-list">
+                    <div v-for="cam in cameras" :key="cam.id" class="camera-item"
+                        :class="{ active: cam.visible, inactive: !cam.visible }" @click="toggleCamera(cam.id)">
+                        <span>{{ cam.name }}</span>
+                        <span>{{ cam.visible ? '✓' : '+' }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="status-bar">
-                <span class="live-indicator">LIVE</span>
-                <span class="bandwidth-total" id="total-bandwidth">0 KB/s</span>
+
+            <div class="main-content" :class="{ 'sidebar-open': sidebarOpen }">
+                <div class="grid" :class="'layout-' + layout">
+                    <div v-for="cam in cameras" :key="cam.id" class="camera-card" :class="{ hidden: !cam.visible }"
+                        :id="'card-' + cam.id">
+                        <div class="camera-overlay">
+                            <div>
+                                <div class="camera-name">{{ cam.name }}</div>
+                                <div class="camera-group">{{ cam.group }}</div>
+                            </div>
+                            <div style="display:flex;gap:4px;align-items:center">
+                                <span class="camera-status" :class="cam.status">{{ cam.statusText }}</span>
+                                <button class="close-btn" @click="cam.visible = false">✕</button>
+                            </div>
+                        </div>
+                        <div class="video-container" @dblclick="toggleFullscreen(cam.id)">
+                            <video :id="'video-' + cam.id" autoplay muted playsinline></video>
+                        </div>
+                        <div class="controls">
+                            <button class="btn" @click="reloadStream(cam.id)">↻</button>
+                            <button class="btn" @click="takeSnapshot(cam.id)">📷</button>
+                            <button class="btn" @click="togglePiP(cam.id)" title="Picture-in-Picture">🖼️</button>
+                            <button v-if="cam.ptz" class="btn" @click="openPTZ(cam)" title="PTZ Control">🎮</button>
+                            <button class="btn" @click="toggleFullscreen(cam.id)">⛶</button>
+                            <button class="btn" @click="toggleMute(cam.id)">🔊</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
 
-    <div class="sidebar" id="sidebar">
-        <h3>📊 Bandwidth Monitor</h3>
-        <div id="bandwidth-list"></div>
-
-        <h3>📁 Grup Kamera</h3>
-        <div id="group-list"></div>
-
-        <h3>📷 Semua Kamera</h3>
-        <div class="camera-list" id="all-cameras"></div>
-    </div>
-
-    <div class="main-content" id="main-content">
-        <div class="grid layout-2x2" id="camera-grid"></div>
-    </div>
-
-    <!-- Snapshot Preview -->
-    <div class="snapshot-preview" id="snapshot-preview">
-        <button class="close" onclick="closeSnapshot()">✕</button>
-        <img id="snapshot-img" src="">
-        <div class="actions">
-            <button class="btn" onclick="downloadSnapshot()">💾 Download</button>
-            <button class="btn" onclick="closeSnapshot()">Tutup</button>
+        <!-- PTZ Modal -->
+        <div v-if="ptzCamera" class="ptz-overlay" @click.self="ptzCamera = null">
+            <div class="ptz-container">
+                <div class="ptz-header">
+                    <span class="ptz-title">🎮 PTZ Control - {{ ptzCamera.name }}</span>
+                    <button class="ptz-close" @click="ptzCamera = null">✕</button>
+                </div>
+                <div class="ptz-grid">
+                    <button class="ptz-btn" @mousedown="ptzMove('upleft')" @mouseup="ptzStop()">↖</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('up')" @mouseup="ptzStop()">↑</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('upright')" @mouseup="ptzStop()">↗</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('left')" @mouseup="ptzStop()">←</button>
+                    <button class="ptz-btn center">◎</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('right')" @mouseup="ptzStop()">→</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('downleft')" @mouseup="ptzStop()">↙</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('down')" @mouseup="ptzStop()">↓</button>
+                    <button class="ptz-btn" @mousedown="ptzMove('downright')" @mouseup="ptzStop()">↘</button>
+                </div>
+                <div class="ptz-zoom">
+                    <button class="ptz-zoom-btn" @mousedown="ptzZoom('in')" @mouseup="ptzStop()">🔍 +</button>
+                    <button class="ptz-zoom-btn" @mousedown="ptzZoom('out')" @mouseup="ptzStop()">🔎 -</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Camera Groups
-        const cameraGroups = {
-            'Pintu Masuk': ['camera2', 'pintu_masuk_1b'],
-            'Pintu Keluar': ['camera3', 'pintu_keluar_2b', 'pintu_keluar_2a']
+        const { createApp, ref, reactive, computed, onMounted, nextTick } = Vue;
+
+        // Configuration - in production, load from secure backend
+        const CONFIG = {
+            API_URL: 'http://36.93.71.27:1984',
+            SESSION_KEY: 'cctv_session',
+            SESSION_DURATION: 8 * 60 * 60 * 1000, // 8 hours
+            // Credentials should be validated server-side in production
+            VALID_USERS: {
+                'admin': { password: '2025-CCTVknw', role: 'admin' },
+                'operator': { password: 'operator123', role: 'operator' }
+            }
         };
 
-        let cameras = [
-            { id: 'camera2', name: 'Camera 2', stream: 'camera2_web', visible: true, group: 'Pintu Masuk', bandwidth: 0 },
-            { id: 'camera3', name: 'Camera 3', stream: 'camera3_web', visible: true, group: 'Pintu Keluar', bandwidth: 0 },
-            { id: 'pintu_masuk_1b', name: 'Pintu Masuk 1B', stream: 'pintu_masuk_1b_web', visible: true, group: 'Pintu Masuk', bandwidth: 0 },
-            { id: 'pintu_keluar_2b', name: 'Pintu Keluar 2B', stream: 'pintu_keluar_2b_web', visible: true, group: 'Pintu Keluar', bandwidth: 0 },
-            { id: 'pintu_keluar_2a', name: 'Pintu Keluar 2A', stream: 'pintu_keluar_2a_web', visible: true, group: 'Pintu Keluar', bandwidth: 0 }
-        ];
+        createApp({
+            setup() {
+                // Auth state
+                const isAuthenticated = ref(false);
+                const currentUser = ref('');
+                const loginForm = reactive({ username: '', password: '' });
+                const loginError = ref('');
+                const isLoading = ref(false);
 
-        const players = {};
-        const BASE_URL = 'http://localhost:1984';
-        let sidebarOpen = false;
-        let currentSnapshot = null;
+                // Dashboard state
+                const layout = ref('2x2');
+                const layouts = ['1x1', '2x2', '3x3', '4x4'];
+                const sidebarOpen = ref(false);
+                const players = {};
 
-        // Bandwidth monitoring
-        async function updateBandwidth() {
-            try {
-                const res = await fetch(`${BASE_URL}/api/streams`);
-                const data = await res.json();
-                let total = 0;
+                // Clock state
+                const currentTime = ref('');
+                const currentDay = ref('');
+                const currentDate = ref('');
 
-                cameras.forEach(cam => {
-                    const streamData = data[cam.stream];
-                    if (streamData?.producers?.[0]?.bytes_recv) {
-                        const bytes = streamData.producers[0].bytes_recv;
-                        const kbps = Math.round((bytes - (cam.lastBytes || 0)) / 1024);
-                        cam.bandwidth = Math.max(0, kbps);
-                        cam.lastBytes = bytes;
-                        total += cam.bandwidth;
+                function updateClock() {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                    currentTime.value = `${hours}:${minutes}:${seconds}`;
 
-                        const bwEl = document.getElementById(`bw-${cam.id}`);
-                        if (bwEl) bwEl.textContent = formatBytes(cam.bandwidth);
+                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                    currentDay.value = days[now.getDay()];
+                    const date = now.getDate();
+                    const month = months[now.getMonth()];
+                    const year = now.getFullYear();
+                    currentDate.value = `${date} ${month} ${year}`;
+                }
+
+                // Camera data - 14 kamera dari 7 lokasi (RTSP langsung, lebih ringan)
+                const cameras = reactive([
+                    // Labkesda
+                    { id: 'labkesda1', name: 'Labkesda 1', stream: 'labkesda1', visible: true, group: 'Labkesda', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'labkesda2', name: 'Labkesda 2', stream: 'labkesda2', visible: true, group: 'Labkesda', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Sosial
+                    { id: 'sosial1', name: 'Sosial 1', stream: 'sosial1', visible: true, group: 'Sosial', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'sosial2', name: 'Sosial 2', stream: 'sosial2', visible: true, group: 'Sosial', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Asambu
+                    { id: 'asambu1', name: 'Asambu 1', stream: 'asambu1', visible: true, group: 'Asambu', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'asambu2', name: 'Asambu 2', stream: 'asambu2', visible: true, group: 'Asambu', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Kel. Unaaha
+                    { id: 'unaaha1', name: 'Kel. Unaaha 1', stream: 'unaaha1', visible: true, group: 'Kel. Unaaha', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'unaaha2', name: 'Kel. Unaaha 2', stream: 'unaaha2', visible: true, group: 'Kel. Unaaha', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Pasar Asinua
+                    { id: 'pasar_asinua1', name: 'Pasar Asinua 1', stream: 'pasar_asinua1', visible: true, group: 'Pasar Asinua', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'pasar_asinua2', name: 'Pasar Asinua 2', stream: 'pasar_asinua2', visible: true, group: 'Pasar Asinua', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Asinua
+                    { id: 'asinua1', name: 'Asinua 1', stream: 'asinua1', visible: true, group: 'Asinua', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'asinua2', name: 'Asinua 2', stream: 'asinua2', visible: true, group: 'Asinua', bandwidth: 0, status: 'loading', statusText: '...' },
+                    // Inalahi
+                    { id: 'inalahi1', name: 'Inalahi 1', stream: 'inalahi1', visible: true, group: 'Inalahi', bandwidth: 0, status: 'loading', statusText: '...' },
+                    { id: 'inalahi2', name: 'Inalahi 2', stream: 'inalahi2', visible: true, group: 'Inalahi', bandwidth: 0, status: 'loading', statusText: '...' }
+                ]);
+
+                // PTZ state
+                const ptzCamera = ref(null);
+
+                // Computed
+                const totalBandwidth = computed(() => {
+                    const total = cameras.reduce((sum, c) => sum + c.bandwidth, 0);
+                    return formatBw(total);
+                });
+
+                // Auth functions
+                function checkSession() {
+                    try {
+                        const session = JSON.parse(localStorage.getItem(CONFIG.SESSION_KEY));
+                        if (session && session.expires > Date.now()) {
+                            isAuthenticated.value = true;
+                            currentUser.value = session.username;
+                            return true;
+                        }
+                    } catch (e) { }
+                    return false;
+                }
+
+                function handleLogin() {
+                    isLoading.value = true;
+                    loginError.value = '';
+
+                    setTimeout(() => {
+                        const user = CONFIG.VALID_USERS[loginForm.username];
+
+                        if (user && user.password === loginForm.password) {
+                            const session = {
+                                username: loginForm.username,
+                                role: user.role,
+                                expires: Date.now() + CONFIG.SESSION_DURATION
+                            };
+                            localStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify(session));
+                            isAuthenticated.value = true;
+                            currentUser.value = loginForm.username;
+
+                            nextTick(() => initAllStreams());
+                        } else {
+                            loginError.value = 'Username atau password salah';
+                        }
+
+                        isLoading.value = false;
+                    }, 500);
+                }
+
+                function handleLogout() {
+                    localStorage.removeItem(CONFIG.SESSION_KEY);
+                    Object.values(players).forEach(p => p?.destroy?.());
+                    isAuthenticated.value = false;
+                    currentUser.value = '';
+                    loginForm.username = '';
+                    loginForm.password = '';
+                }
+
+                // Stream functions
+                function initStream(camId) {
+                    const cam = cameras.find(c => c.id === camId);
+                    if (!cam?.visible) return;
+
+                    const video = document.getElementById(`video-${camId}`);
+                    if (!video) return;
+
+                    if (Hls.isSupported()) {
+                        const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+                        hls.loadSource(`${CONFIG.API_URL}/api/stream.m3u8?src=${cam.stream}`);
+                        hls.attachMedia(video);
+
+                        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                            cam.status = '';
+                            cam.statusText = 'LIVE';
+                            video.play().catch(() => { });
+                        });
+
+                        hls.on(Hls.Events.ERROR, (e, d) => {
+                            if (d.fatal) {
+                                cam.status = 'error';
+                                cam.statusText = 'ERR';
+                                showDisconnectNotification(cam.name);
+                                setTimeout(() => reloadStream(camId), 5000);
+                            }
+                        });
+
+                        players[camId] = hls;
+                    }
+                }
+
+                function initAllStreams() {
+                    cameras.filter(c => c.visible).forEach(cam => {
+                        setTimeout(() => initStream(cam.id), 100);
+                    });
+                    setInterval(updateBandwidth, 2000);
+                }
+
+                function reloadStream(camId) {
+                    const cam = cameras.find(c => c.id === camId);
+                    if (cam) {
+                        cam.status = 'loading';
+                        cam.statusText = '...';
+                    }
+                    if (players[camId]) players[camId].destroy();
+                    initStream(camId);
+                }
+
+                function toggleCamera(camId) {
+                    const cam = cameras.find(c => c.id === camId);
+                    if (cam) {
+                        cam.visible = !cam.visible;
+                        if (cam.visible) nextTick(() => initStream(camId));
+                    }
+                }
+
+                // Utility functions
+                function formatBw(kb) {
+                    if (kb < 1024) return kb + ' KB/s';
+                    return (kb / 1024).toFixed(1) + ' MB/s';
+                }
+
+                async function updateBandwidth() {
+                    try {
+                        const res = await fetch(`${CONFIG.API_URL}/api/streams`);
+                        const data = await res.json();
+
+                        cameras.forEach(cam => {
+                            const streamData = data[cam.stream];
+                            if (streamData?.producers?.[0]?.bytes_recv) {
+                                const bytes = streamData.producers[0].bytes_recv;
+                                cam.bandwidth = Math.max(0, Math.round((bytes - (cam.lastBytes || 0)) / 1024));
+                                cam.lastBytes = bytes;
+                            }
+                        });
+                    } catch (e) { }
+                }
+
+                async function takeSnapshot(camId) {
+                    const cam = cameras.find(c => c.id === camId);
+                    try {
+                        const url = `${CONFIG.API_URL}/api/frame.jpeg?src=${cam.stream}`;
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `${cam.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.jpg`;
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                    } catch (e) {
+                        alert('Gagal mengambil snapshot');
+                    }
+                }
+
+                function toggleFullscreen(camId) {
+                    document.getElementById(`video-${camId}`)?.requestFullscreen?.();
+                }
+
+                function toggleMute(camId) {
+                    const v = document.getElementById(`video-${camId}`);
+                    if (v) v.muted = !v.muted;
+                }
+
+                // Picture-in-Picture
+                async function togglePiP(camId) {
+                    const video = document.getElementById(`video-${camId}`);
+                    if (!video) return;
+
+                    try {
+                        if (document.pictureInPictureElement) {
+                            await document.exitPictureInPicture();
+                        } else if (document.pictureInPictureEnabled) {
+                            await video.requestPictureInPicture();
+                        } else {
+                            alert('Browser tidak mendukung Picture-in-Picture');
+                        }
+                    } catch (e) {
+                        console.error('PiP error:', e);
+                    }
+                }
+
+                // Browser Notifications
+                function requestNotificationPermission() {
+                    if ('Notification' in window && Notification.permission === 'default') {
+                        Notification.requestPermission();
+                    }
+                }
+
+                function showDisconnectNotification(camName) {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('⚠️ CCTV Disconnect', {
+                            body: `Kamera "${camName}" terputus!`,
+                            icon: '📹',
+                            tag: 'cctv-disconnect'
+                        });
+                    }
+                }
+
+                // PTZ Control Functions
+                function openPTZ(cam) {
+                    ptzCamera.value = cam;
+                }
+
+                async function ptzMove(direction) {
+                    if (!ptzCamera.value?.onvif) return;
+
+                    const directionMap = {
+                        'up': { x: 0, y: 0.5 },
+                        'down': { x: 0, y: -0.5 },
+                        'left': { x: -0.5, y: 0 },
+                        'right': { x: 0.5, y: 0 },
+                        'upleft': { x: -0.5, y: 0.5 },
+                        'upright': { x: 0.5, y: 0.5 },
+                        'downleft': { x: -0.5, y: -0.5 },
+                        'downright': { x: 0.5, y: -0.5 }
+                    };
+
+                    const move = directionMap[direction] || { x: 0, y: 0 };
+
+                    try {
+                        await fetch(`${CONFIG.API_URL}/api/ptz?src=${ptzCamera.value.onvif}&x=${move.x}&y=${move.y}`);
+                    } catch (e) {
+                        console.error('PTZ move error:', e);
+                    }
+                }
+
+                async function ptzZoom(direction) {
+                    if (!ptzCamera.value?.onvif) return;
+
+                    const zoom = direction === 'in' ? 0.5 : -0.5;
+
+                    try {
+                        await fetch(`${CONFIG.API_URL}/api/ptz?src=${ptzCamera.value.onvif}&zoom=${zoom}`);
+                    } catch (e) {
+                        console.error('PTZ zoom error:', e);
+                    }
+                }
+
+                async function ptzStop() {
+                    if (!ptzCamera.value?.onvif) return;
+
+                    try {
+                        await fetch(`${CONFIG.API_URL}/api/ptz?src=${ptzCamera.value.onvif}&x=0&y=0&zoom=0`);
+                    } catch (e) {
+                        console.error('PTZ stop error:', e);
+                    }
+                }
+
+                // Lifecycle
+                onMounted(() => {
+                    // Start clock
+                    updateClock();
+                    setInterval(updateClock, 1000);
+
+                    // Request notification permission
+                    requestNotificationPermission();
+
+                    if (checkSession()) {
+                        nextTick(() => initAllStreams());
                     }
                 });
 
-                document.getElementById('total-bandwidth').textContent = formatBytes(total);
-                updateBandwidthList();
-            } catch (e) { }
-        }
-
-        function formatBytes(kb) {
-            if (kb < 1024) return kb + ' KB/s';
-            return (kb / 1024).toFixed(1) + ' MB/s';
-        }
-
-        function updateBandwidthList() {
-            const list = document.getElementById('bandwidth-list');
-            list.innerHTML = cameras.map(c => `
-                <div class="camera-item ${c.visible ? 'active' : 'inactive'}">
-                    <span class="camera-item-name">${c.name}</span>
-                    <span style="color:${c.bandwidth > 500 ? '#0f0' : '#666'}">${formatBytes(c.bandwidth)}</span>
-                </div>
-            `).join('');
-        }
-
-        function updateGroupList() {
-            const list = document.getElementById('group-list');
-            list.innerHTML = Object.entries(cameraGroups).map(([group, ids]) => `
-                <div class="group-section">
-                    <div class="group-title" onclick="toggleGroup('${group}')">📁 ${group} (${ids.length})</div>
-                    <div class="camera-list">
-                        ${ids.map(id => {
-                const c = cameras.find(x => x.id === id);
-                return c ? `<div class="camera-item ${c.visible ? 'active' : 'inactive'}" onclick="toggleCamera('${c.id}')">${c.name}</div>` : '';
-            }).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function toggleGroup(group) {
-            const ids = cameraGroups[group];
-            const allVisible = ids.every(id => cameras.find(c => c.id === id)?.visible);
-            ids.forEach(id => {
-                const cam = cameras.find(c => c.id === id);
-                if (cam) {
-                    cam.visible = !allVisible;
-                    document.getElementById(`card-${id}`)?.classList.toggle('hidden', !cam.visible);
-                    if (cam.visible && !players[id]) initStream(id);
-                }
-            });
-            updateAllLists();
-            saveCameraState();
-        }
-
-        function updateAllLists() {
-            updateBandwidthList();
-            updateGroupList();
-            document.getElementById('all-cameras').innerHTML = cameras.map(c => `
-                <div class="camera-item ${c.visible ? 'active' : 'inactive'}" onclick="toggleCamera('${c.id}')">
-                    <div class="camera-item-info">
-                        <span class="camera-item-name">${c.name}</span>
-                        <span class="camera-item-bandwidth">${c.group}</span>
-                    </div>
-                    <span>${c.visible ? '✓' : '+'}</span>
-                </div>
-            `).join('');
-        }
-
-        // Snapshot functionality - using go2rtc API
-        async function takeSnapshot(camId) {
-            const cam = cameras.find(c => c.id === camId);
-            const status = document.getElementById(`status-${camId}`);
-
-            try {
-                // Use go2rtc frame.jpeg API
-                const snapshotUrl = `${BASE_URL}/api/frame.jpeg?src=${cam.stream}`;
-
-                // Fetch the image as blob
-                const response = await fetch(snapshotUrl);
-                if (!response.ok) throw new Error('Failed to capture');
-
-                const blob = await response.blob();
-                currentSnapshot = {
-                    data: URL.createObjectURL(blob),
-                    blob: blob,
-                    name: `${cam.name.replace(/\s+/g, '_')}_${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`
+                return {
+                    isAuthenticated, currentUser, loginForm, loginError, isLoading,
+                    layout, layouts, sidebarOpen, cameras, totalBandwidth,
+                    currentTime, currentDay, currentDate, ptzCamera,
+                    handleLogin, handleLogout, toggleCamera, reloadStream,
+                    takeSnapshot, toggleFullscreen, toggleMute, togglePiP, formatBw,
+                    openPTZ, ptzMove, ptzZoom, ptzStop
                 };
-
-                document.getElementById('snapshot-img').src = currentSnapshot.data;
-                document.getElementById('snapshot-preview').classList.add('show');
-            } catch (e) {
-                // Fallback: try canvas method with crossorigin
-                const video = document.getElementById(`video-${camId}`);
-                try {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth || 1920;
-                    canvas.height = video.videoHeight || 1080;
-                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    canvas.toBlob(blob => {
-                        currentSnapshot = {
-                            data: URL.createObjectURL(blob),
-                            blob: blob,
-                            name: `${cam.name.replace(/\s+/g, '_')}_${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`
-                        };
-                        document.getElementById('snapshot-img').src = currentSnapshot.data;
-                        document.getElementById('snapshot-preview').classList.add('show');
-                    }, 'image/jpeg', 0.9);
-                } catch (err) {
-                    alert('Gagal mengambil snapshot. Stream mungkin belum siap.');
-                }
             }
-        }
-
-        function downloadSnapshot() {
-            if (!currentSnapshot) return;
-            const a = document.createElement('a');
-            a.href = currentSnapshot.data;
-            a.download = currentSnapshot.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function closeSnapshot() {
-            if (currentSnapshot?.data?.startsWith('blob:')) {
-                URL.revokeObjectURL(currentSnapshot.data);
-            }
-            document.getElementById('snapshot-preview').classList.remove('show');
-        }
-
-        function toggleSidebar() {
-            sidebarOpen = !sidebarOpen;
-            document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
-            document.getElementById('main-content').classList.toggle('sidebar-open', sidebarOpen);
-        }
-
-        function toggleCamera(camId) {
-            const cam = cameras.find(c => c.id === camId);
-            cam.visible = !cam.visible;
-            document.getElementById(`card-${camId}`)?.classList.toggle('hidden', !cam.visible);
-            if (cam.visible && !players[camId]) initStream(camId);
-            updateAllLists();
-            saveCameraState();
-        }
-
-        function hideCamera(camId) {
-            const cam = cameras.find(c => c.id === camId);
-            cam.visible = false;
-            document.getElementById(`card-${camId}`)?.classList.add('hidden');
-            updateAllLists();
-            saveCameraState();
-        }
-
-        function setLayout(layout) {
-            document.getElementById('camera-grid').className = 'grid layout-' + layout;
-            document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            localStorage.setItem('cctv-layout', layout);
-        }
-
-        function renderCameras() {
-            document.getElementById('camera-grid').innerHTML = cameras.map(cam => `
-                <div class="camera-card ${cam.visible ? '' : 'hidden'}" id="card-${cam.id}" draggable="true">
-                    <div class="camera-overlay">
-                        <div class="overlay-left">
-                            <span class="camera-name">${cam.name}</span>
-                            <span class="camera-group">${cam.group}</span>
-                            <span class="camera-bandwidth" id="bw-${cam.id}">0 KB/s</span>
-                        </div>
-                        <div class="overlay-right">
-                            <span class="camera-status loading" id="status-${cam.id}">...</span>
-                            <button class="close-btn" onclick="hideCamera('${cam.id}')">✕</button>
-                        </div>
-                    </div>
-                    <div class="video-container" ondblclick="toggleFullscreen('video-${cam.id}')">
-                        <video id="video-${cam.id}" autoplay muted playsinline></video>
-                    </div>
-                    <div class="controls">
-                        <button class="btn" onclick="reloadStream('${cam.id}')">↻</button>
-                        <button class="btn btn-snapshot" onclick="takeSnapshot('${cam.id}')">📷</button>
-                        <button class="btn" onclick="toggleFullscreen('video-${cam.id}')">⛶</button>
-                        <button class="btn" onclick="toggleMute('video-${cam.id}')">🔊</button>
-                    </div>
-                </div>
-            `).join('');
-
-            setupDragAndDrop();
-            updateAllLists();
-        }
-
-        function setupDragAndDrop() {
-            let draggedItem = null;
-            document.querySelectorAll('.camera-card').forEach(card => {
-                card.addEventListener('dragstart', () => { draggedItem = card; card.classList.add('dragging'); });
-                card.addEventListener('dragend', () => { draggedItem?.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over')); saveCameraState(); });
-                card.addEventListener('dragover', e => { e.preventDefault(); if (card !== draggedItem) card.classList.add('drag-over'); });
-                card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
-                card.addEventListener('drop', e => {
-                    e.preventDefault();
-                    card.classList.remove('drag-over');
-                    if (draggedItem && card !== draggedItem) {
-                        const grid = document.getElementById('camera-grid');
-                        const cards = [...grid.children];
-                        const di = cards.indexOf(draggedItem), ti = cards.indexOf(card);
-                        di < ti ? card.after(draggedItem) : card.before(draggedItem);
-                        [cameras[di], cameras[ti]] = [cameras[ti], cameras[di]];
-                    }
-                });
-            });
-        }
-
-        function saveCameraState() { localStorage.setItem('cctv-cameras', JSON.stringify(cameras.map(c => ({ id: c.id, visible: c.visible })))); }
-
-        function loadCameraState() {
-            try {
-                const saved = JSON.parse(localStorage.getItem('cctv-cameras'));
-                if (saved) {
-                    saved.forEach(s => { const c = cameras.find(x => x.id === s.id); if (c) c.visible = s.visible; });
-                    cameras.sort((a, b) => saved.findIndex(s => s.id === a.id) - saved.findIndex(s => s.id === b.id));
-                }
-            } catch (e) { }
-            const layout = localStorage.getItem('cctv-layout');
-            if (layout) document.getElementById('camera-grid').className = 'grid layout-' + layout;
-        }
-
-        function initStream(camId) {
-            const cam = cameras.find(c => c.id === camId);
-            if (!cam?.visible) return;
-            const video = document.getElementById(`video-${camId}`);
-            const status = document.getElementById(`status-${camId}`);
-
-            if (Hls.isSupported()) {
-                const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-                hls.loadSource(`${BASE_URL}/api/stream.m3u8?src=${cam.stream}`);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => { status.textContent = 'LIVE'; status.className = 'camera-status'; video.play().catch(() => { }); });
-                hls.on(Hls.Events.ERROR, (e, d) => { if (d.fatal) { status.textContent = 'ERR'; status.className = 'camera-status error'; setTimeout(() => reloadStream(camId), 5000); } });
-                players[camId] = hls;
-            }
-        }
-
-        function reloadStream(camId) {
-            const status = document.getElementById(`status-${camId}`);
-            status.textContent = '...'; status.className = 'camera-status loading';
-            if (players[camId]) players[camId].destroy();
-            initStream(camId);
-        }
-
-        function toggleFullscreen(id) { document.getElementById(id)?.requestFullscreen?.(); }
-        function toggleMute(id) { const v = document.getElementById(id); if (v) v.muted = !v.muted; }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCameraState();
-            renderCameras();
-            cameras.filter(c => c.visible).forEach(cam => initStream(cam.id));
-            setInterval(updateBandwidth, 2000);
-        });
+        }).mount('#app');
     </script>
 </body>
 
