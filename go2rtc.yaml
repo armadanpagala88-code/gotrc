@@ -1,18 +1,19 @@
 streams:
   labkesda1: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:554/stream2#timeout=30"
   labkesda2: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:555/stream2#timeout=30"
-  sosial1: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream2#timeout=30"
-  sosial2: "rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream2#timeout=30"
+  sosial1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream2#video=h264"
+  sosial2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream2#video=h264"
   asambu1: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream2#timeout=30"
   asambu2: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream2#timeout=30"
   unaaha1: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream2#timeout=30"
   unaaha2: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream2#timeout=30"
   pasar_asinua1: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream2#timeout=30"
   pasar_asinua2: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream2#timeout=30"
-  asinua1: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream2#timeout=30"
-  asinua2: "rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream2#timeout=30"
-  inalahi1: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream2#timeout=30"
-  inalahi2: "rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream2#timeout=30"
+  asinua1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream2#video=h264"
+  asinua2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream2#video=h264"
+  inalahi1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream2#video=h264"
+  inalahi2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream2#video=h264"
+  uepai1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-uepai.ddns.net:6550/stream1#video=h264"
 
 ffmpeg:
   bin: ffmpeg
@@ -24,6 +25,7 @@ api:
 
 rtsp:
   listen: ":8554"
+  default_query: "timeout=5"
 
 webrtc:
   listen: ":8555/tcp"
@@ -31,8 +33,9 @@ webrtc:
     - urls: [stun:stun.l.google.com:19302]
 
 hls:
-  segment_duration: 2
-  playlist_size: 5
+  segment_duration: 1
+  playlist_size: 3
+  part_duration: 0.5
 
 log:
   level: info
