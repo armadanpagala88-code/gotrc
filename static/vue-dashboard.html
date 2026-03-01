@@ -988,12 +988,13 @@
         var API = 'http://36.93.71.27:1984';
 
         /* ===== TAB SWITCHING ===== */
-        var activeTab = 'webgis';
+        var activeTab = localStorage.getItem('activeTab') || 'webgis';
         var mapInstance = null;
         var mapInitialized = false;
 
         function switchTab(tab) {
             activeTab = tab;
+            localStorage.setItem('activeTab', tab);
             document.getElementById('cctv-wrap').classList.toggle('hidden', tab !== 'cctv');
             document.getElementById('webgis-wrap').classList.toggle('active', tab === 'webgis');
             document.getElementById('tab-cctv').classList.toggle('active', tab === 'cctv');
@@ -1548,9 +1549,14 @@
             }).catch(function () { });
         }
         setInterval(fetchBW, 3000);
+
+        // Render initial CCTV list (hidden initially if WebGIS is active)
         render();
-        // Auto-init map since WebGIS is default tab
-        setTimeout(function () { if (!mapInitialized) initMap(); }, 100);
+
+        // Initialize UI state based on localStorage choice
+        setTimeout(function () {
+            switchTab(activeTab);
+        }, 100);
     </script>
 </body>
 
