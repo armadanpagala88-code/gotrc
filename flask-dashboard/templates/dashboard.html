@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Diskominfo Konawe</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="{% if is_public %}public-mode{% endif %}">
+    <div class="app">
+        <header class="header">
+            <div class="header-left">
+                <h1>🎥 {{ title }}</h1>
+                <div class="layout-btns">
+                    <button class="btn" onclick="setLayout('2x2')">2x2</button>
+                    <button class="btn active" onclick="setLayout('3x3')">3x3</button>
+                    <button class="btn" onclick="setLayout('4x4')">4x4</button>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="clock" id="clock"></span>
+                <span class="date" id="date"></span>
+                <span class="online-count">Online: <span id="online">0</span>/{{ cameras|length }}</span>
+            </div>
+        </header>
+
+        <div class="ticker">
+            <div class="ticker-content">
+                <span class="hl">CCTV Dinas Komunikasi dan Informatika Kab. Konawe</span> -
+                Sistem Pemantauan Real-Time -
+                {% for group in cameras|map(attribute='group')|unique %}{{ group }} - {% endfor %}
+                <span class="hl">Total {{ cameras|length }} Kamera</span>
+            </div>
+        </div>
+
+        <main class="main">
+            <div id="grid" class="grid grid-3x3">
+                {% for cam in cameras %}
+                <div class="cam-box" id="box-{{ cam.id }}" data-id="{{ cam.id }}">
+                    <video id="video-{{ cam.id }}" muted autoplay playsinline></video>
+                    <div class="cam-header">
+                        <div class="cam-info">
+                            <span class="cam-name">{{ cam.name }}</span>
+                            <span class="cam-group">{{ cam.group }}</span>
+                        </div>
+                        <span class="badge loading" id="status-{{ cam.id }}">Loading</span>
+                    </div>
+                    <div class="cam-controls">
+                        <button class="ctrl-btn" onclick="screenshot('{{ cam.id }}')" title="Screenshot">📷</button>
+                        <button class="ctrl-btn" onclick="fullscreen('{{ cam.id }}')" title="Fullscreen">⛶</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <span>© 2026 Diskominfo Kab. Konawe</span>
+            <span>Powered by Flask + go2rtc</span>
+        </footer>
+    </div>
+
+    <script>
+        const GO2RTC_URL = "{{ go2rtc_url }}";
+        const cameras = {{ cameras| tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

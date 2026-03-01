@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV Dashboard - Konawe</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #fff
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .header h1 {
+            font-size: 15px;
+            color: #0ea5e9
+        }
+
+        .datetime {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .date {
+            font-size: 11px;
+            color: #888
+        }
+
+        .time {
+            font-size: 14px;
+            color: #22c55e;
+            font-family: monospace;
+            font-weight: bold
+        }
+
+        .live-badge {
+            background: #ef4444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.5
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn {
+            padding: 5px 12px;
+            border: 1px solid #444;
+            background: #1a1a2e;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 11px
+        }
+
+        .btn:hover {
+            background: #2a2a4e
+        }
+
+        .btn.active {
+            background: #0ea5e9;
+            border-color: #0ea5e9
+        }
+
+        .ticker {
+            background: #0a0a0a;
+            border-bottom: 1px solid #222;
+            overflow: hidden;
+            flex-shrink: 0
+        }
+
+        .ticker-content {
+            display: inline-block;
+            padding: 5px 0;
+            animation: ticker 25s linear infinite;
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(100vw)
+            }
+
+            100% {
+                transform: translateX(-100%)
+            }
+        }
+
+        .ticker-content .hl {
+            color: #0ea5e9
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0
+        }
+
+        .grid-wrap {
+            flex: 1;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden
+        }
+
+        .grid {
+            display: grid;
+            gap: 5px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden
+        }
+
+        .grid-1x1 {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr
+        }
+
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr)
+        }
+
+        .grid-3x3 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr)
+        }
+
+        .grid-4x4 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr)
+        }
+
+        .cam-box {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            min-height: 0
+        }
+
+        .cam-box.dragging {
+            opacity: 0.5;
+            cursor: grabbing
+        }
+
+        .cam-box.dragover {
+            border: 2px solid #0ea5e9
+        }
+
+        .cam-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none
+        }
+
+        .cam-hdr {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), transparent);
+            padding: 6px 8px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10
+        }
+
+        .cam-name {
+            font-size: 10px;
+            font-weight: 600
+        }
+
+        .cam-grp {
+            font-size: 9px;
+            color: #888
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            background: #22c55e
+        }
+
+        .badge.loading {
+            background: #eab308
+        }
+
+        .badge.error {
+            background: #ef4444
+        }
+
+        .cam-ctrl {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            padding: 15px 6px 6px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 4px;
+            opacity: 0;
+            transition: 0.2s;
+            z-index: 10
+        }
+
+        .cam-box:hover .cam-ctrl {
+            opacity: 1
+        }
+
+        .cbtn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .cbtn:hover {
+            background: #0ea5e9
+        }
+
+        .close-fs {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000
+        }
+
+        .close-fs:hover {
+            background: #ef4444
+        }
+
+        .cam-box.fs .close-fs {
+            display: block
+        }
+
+        .cam-box.fs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            border-radius: 0;
+            cursor: default
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            background: #111;
+            border-top: 1px solid #222;
+            flex-shrink: 0
+        }
+
+        .page-btn {
+            padding: 6px 14px;
+            border: 1px solid #444;
+            background: #1a1a2e;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px
+        }
+
+        .page-btn:hover {
+            background: #0ea5e9
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed
+        }
+
+        .page-info {
+            font-size: 12px;
+            color: #888
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #111;
+            border-left: 1px solid #333;
+            display: none;
+            flex-direction: column;
+            flex-shrink: 0
+        }
+
+        .sidebar.open {
+            display: flex
+        }
+
+        .sb-hdr {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .sb-hdr h3 {
+            font-size: 12px;
+            color: #888
+        }
+
+        .sb-section {
+            padding: 8px;
+            border-bottom: 1px solid #222
+        }
+
+        .sb-title {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 6px
+        }
+
+        .sb-list {
+            max-height: 200px;
+            overflow-y: auto
+        }
+
+        .sb-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 11px;
+            border-left: 2px solid #22c55e;
+            padding-left: 8px;
+            margin-bottom: 2px
+        }
+
+        .sb-bw {
+            color: #0ea5e9;
+            font-family: monospace;
+            font-size: 10px
+        }
+
+        .sb-cam {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 0;
+            font-size: 11px
+        }
+
+        .sb-cam input {
+            accent-color: #22c55e
+        }
+
+        .footer {
+            background: #111;
+            border-top: 1px solid #333;
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #666;
+            flex-shrink: 0
+        }
+    </style>
+</head>
+
+<body>
+    <script>var p = sessionStorage.getItem("auth"); if (!p) { p = prompt("Masukkan Password:"); if (p !== "bersahaja") { alert("Password salah!"); document.body.innerHTML = "<h1 style='color:red;text-align:center;padding:50px'>Akses Ditolak<\/h1>"; throw new Error("unauthorized"); } sessionStorage.setItem("auth", "1"); }</script>
+    <div class="app">
+        <div class="header">
+            <div class="header-left">
+                <h1>CCTV Kab. Konawe</h1>
+                <div class="datetime"><span class="date" id="date">--</span><span class="time" id="time">--:--:--</span>
+                </div>
+                <div class="live-badge">LIVE</div>
+            </div>
+            <div class="header-right">
+                <button class="btn" onclick="setLayout('1x1')">1x1</button>
+                <button class="btn active" onclick="setLayout('2x2')">2x2</button>
+                <button class="btn" onclick="setLayout('3x3')">3x3</button>
+                <button class="btn" onclick="setLayout('4x4')">4x4</button>
+                <button class="btn" onclick="toggleSidebar()">Menu</button>
+                <button class="btn" onclick="toggleFS()">Fullscreen</button>
+            </div>
+        </div>
+        <div class="ticker">
+            <div class="ticker-content"><span class="hl">CCTV Publik Dinas Komunikasi dan Informatika Kab. Konawe</span>
+                - Sistem Pemantauan Real-Time - Labkesda - Dinsos - Asambu - Kel. Unaaha - Pasar Asinua - Asinua -
+                Inalahi - Uepai - <span class="hl">Total 18 Kamera</span></div>
+        </div>
+        <div class="main">
+            <div class="grid-wrap">
+                <div id="grid" class="grid grid-2x2"></div>
+                <div class="pagination" id="pagination">
+                    <button class="page-btn" id="prevBtn" onclick="prevPage()">◀ Prev</button>
+                    <span class="page-info" id="pageInfo">1 / 1</span>
+                    <button class="page-btn" id="nextBtn" onclick="nextPage()">Next ▶</button>
+                </div>
+            </div>
+            <div class="sidebar" id="sidebar">
+                <div class="sb-hdr">
+                    <h3>Dashboard</h3><button class="cbtn" onclick="toggleSidebar()">X</button>
+                </div>
+                <div class="sb-section">
+                    <div class="sb-title">BANDWIDTH</div>
+                    <div class="sb-list" id="bw-list"></div>
+                </div>
+                <div class="sb-section">
+                    <div class="sb-title">KAMERA</div>
+                    <div class="sb-list" id="cam-list"></div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div>Online: <span id="cnt">0</span>/18</div>
+            <div>Diskominfo Kab. Konawe 2026</div>
+        </div>
+    </div>
+    <script>
+        var API = 'http://36.93.71.27:1984';
+        var cams = [
+            { id: 'labkesda1_sub', name: 'Labkesda 1', grp: 'Labkesda', on: true, bw: 0 },
+            { id: 'labkesda2_sub', name: 'Labkesda 2', grp: 'Labkesda', on: true, bw: 0 },
+            { id: 'sosial1_sub', name: 'Sosial 1', grp: 'Dinsos', on: true, bw: 0 },
+            { id: 'sosial2_sub', name: 'Sosial 2', grp: 'Dinsos', on: true, bw: 0 },
+            { id: 'asambu1_sub', name: 'Asambu 1', grp: 'Asambu', on: true, bw: 0 },
+            { id: 'asambu2_sub', name: 'Asambu 2', grp: 'Asambu', on: true, bw: 0 },
+            { id: 'unaaha1_sub', name: 'Kel. Unaaha 1', grp: 'Kel. Unaaha', on: true, bw: 0 },
+            { id: 'unaaha2_sub', name: 'Kel. Unaaha 2', grp: 'Kel. Unaaha', on: true, bw: 0 },
+            { id: 'pasar_asinua1_sub', name: 'Pasar Asinua 1', grp: 'Pasar Asinua', on: true, bw: 0 },
+            { id: 'pasar_asinua2_sub', name: 'Pasar Asinua 2', grp: 'Pasar Asinua', on: true, bw: 0 },
+            { id: 'asinua1_sub', name: 'Asinua 1', grp: 'Asinua', on: true, bw: 0 },
+            { id: 'asinua2_sub', name: 'Asinua 2', grp: 'Asinua', on: true, bw: 0 },
+            { id: 'inalahi1_sub', name: 'Inalahi 1', grp: 'Inalahi', on: true, bw: 0 },
+            { id: 'inalahi2_sub', name: 'Inalahi 2', grp: 'Inalahi', on: true, bw: 0 },
+            { id: 'uepai1_sub', name: 'Uepai 1', grp: 'Uepai', on: true, bw: 0 }, { id: 'unilaki1_sub', name: 'Unilaki 1', grp: 'Unilaki', on: true, bw: 0 }, { id: 'uepai2_sub', name: 'Uepai 2', grp: 'Uepai', on: true, bw: 0 }, { id: 'unilaki2_sub', name: 'Unilaki 2', grp: 'Unilaki', on: true, bw: 0 }
+        ];
+        var players = {}, layout = '2x2', counts = { '1x1': 1, '2x2': 4, '3x3': 9, '4x4': 16 }, online = 0;
+        var currentPage = 0;
+
+        function updateClock() {
+            var n = new Date();
+            document.getElementById('date').textContent = n.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('time').textContent = n.toLocaleTimeString('id-ID');
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function setLayout(l) {
+            layout = l; currentPage = 0;
+            var btns = document.querySelectorAll('.header-right .btn');
+            for (var i = 0; i < 4; i++)btns[i].className = 'btn';
+            event.target.className = 'btn active';
+            document.getElementById('grid').className = 'grid grid-' + l;
+            render();
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleFS() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+        function closeCamFS(btn) { btn.closest('.cam-box').classList.remove('fs'); }
+        function openCamFS(btn) { btn.closest('.cam-box').classList.add('fs'); }
+        function screenshot(id) {
+            var v = document.getElementById('v-' + id);
+            var c = document.createElement('canvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext('2d').drawImage(v, 0, 0);
+            var a = document.createElement('a');
+            a.download = id + '_' + Date.now() + '.png';
+            a.href = c.toDataURL();
+            a.click();
+        }
+
+        function getVisibleCams() { return cams.filter(function (c) { return c.on }); }
+        function getTotalPages() { var v = getVisibleCams(); var perPage = counts[layout] || 4; return Math.ceil(v.length / perPage); }
+        function prevPage() { if (currentPage > 0) { currentPage--; render(); } }
+        function nextPage() { if (currentPage < getTotalPages() - 1) { currentPage++; render(); } }
+
+        function updatePagination() {
+            var total = getTotalPages();
+            document.getElementById('pageInfo').textContent = (currentPage + 1) + ' / ' + total;
+            document.getElementById('prevBtn').disabled = currentPage === 0;
+            document.getElementById('nextBtn').disabled = currentPage >= total - 1;
+            document.getElementById('pagination').style.display = total > 1 ? 'flex' : 'none';
+        }
+
+        function render() {
+            var g = document.getElementById('grid');
+            g.innerHTML = '';
+            for (var k in players) if (players[k] && players[k].destroy) players[k].destroy();
+            players = {}; online = 0;
+            var perPage = counts[layout] || 4;
+            var visible = getVisibleCams();
+            var start = currentPage * perPage;
+            var pageItems = visible.slice(start, start + perPage);
+            for (var i = 0; i < pageItems.length; i++) {
+                var c = pageItems[i];
+                var box = document.createElement('div');
+                box.className = 'cam-box';
+                box.id = 'box-' + c.id;
+                box.draggable = true;
+                box.dataset.idx = cams.indexOf(c);
+                box.innerHTML = '<video id="v-' + c.id + '" muted autoplay playsinline></video><button class="close-fs" onclick="closeCamFS(this)">✕</button><div class="cam-hdr"><div><div class="cam-name">' + c.name + '</div><div class="cam-grp">' + c.grp + '</div></div><div class="badge loading" id="st-' + c.id + '">Loading</div></div><div class="cam-ctrl"><button class="cbtn" onclick="screenshot(\'' + c.id + '\')" title="Screenshot">📷</button><button class="cbtn" onclick="openCamFS(this)" title="Fullscreen">⛶</button></div>';
+                box.addEventListener('dragstart', handleDragStart);
+                box.addEventListener('dragover', handleDragOver);
+                box.addEventListener('dragleave', handleDragLeave);
+                box.addEventListener('drop', handleDrop);
+                box.addEventListener('dragend', handleDragEnd);
+                g.appendChild(box);
+                (function (camId, delay) { setTimeout(function () { initHLS(camId) }, delay) })(c.id, i * 200);
+            }
+            updateSidebar();
+            updatePagination();
+        }
+
+        var dragSrcIdx = null;
+        function handleDragStart(e) { dragSrcIdx = parseInt(this.dataset.idx); this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('dragover'); }
+        function handleDragLeave() { this.classList.remove('dragover'); }
+        function handleDrop(e) {
+            e.preventDefault(); this.classList.remove('dragover');
+            var targetIdx = parseInt(this.dataset.idx);
+            if (dragSrcIdx !== null && dragSrcIdx !== targetIdx) {
+                var temp = cams[dragSrcIdx]; cams.splice(dragSrcIdx, 1); cams.splice(targetIdx, 0, temp); render();
+            }
+        }
+        function handleDragEnd() { this.classList.remove('dragging'); dragSrcIdx = null; }
+
+        function initHLS(id) {
+            var v = document.getElementById('v-' + id), st = document.getElementById('st-' + id);
+            if (!v) return;
+            if (Hls.isSupported()) {
+                var h = new Hls({ enableWorker: true });
+                h.loadSource(API + '/api/stream.m3u8?src=' + id);
+                h.attachMedia(v);
+                h.on(Hls.Events.MANIFEST_PARSED, function () { v.play(); st.textContent = 'LIVE'; st.className = 'badge'; online++; document.getElementById('cnt').textContent = online });
+                h.on(Hls.Events.ERROR, function (e, d) { if (d.fatal) { st.textContent = 'Retry...'; st.className = 'badge loading'; setTimeout(function () { if (players[id]) { players[id].destroy(); delete players[id]; } initHLS(id); }, 10000); } });
+                players[id] = h;
+            }
+        }
+
+        function updateSidebar() {
+            var bw = '', cl = '';
+            for (var i = 0; i < cams.length; i++) {
+                var c = cams[i];
+                bw += '<div class="sb-item"><span>' + c.name + '</span><span class="sb-bw">' + c.bw + ' KB/s</span></div>';
+                cl += '<label class="sb-cam"><input type="checkbox" ' + (c.on ? 'checked' : '') + ' onchange="toggleCam(\'' + c.id + '\')">' + c.name + '</label>';
+            }
+            document.getElementById('bw-list').innerHTML = bw;
+            document.getElementById('cam-list').innerHTML = cl;
+        }
+
+        function toggleCam(id) {
+            for (var i = 0; i < cams.length; i++)if (cams[i].id === id) { cams[i].on = !cams[i].on; break }
+            currentPage = 0; render();
+        }
+
+        function fetchBW() {
+            fetch(API + '/api/streams').then(function (r) { return r.json() }).then(function (d) {
+                for (var i = 0; i < cams.length; i++) {
+                    var c = cams[i], s = d[c.id];
+                    if (s && s.producers && s.producers[0]) {
+                        var bytes = s.producers[0].bytes_recv || 0;
+                        c.bw = Math.round((bytes - (c.lastBytes || 0)) / 1024);
+                        c.lastBytes = bytes;
+                    }
+                }
+                updateSidebar();
+            }).catch(function () { });
+        }
+        setInterval(fetchBW, 3000);
+        render();
+    </script>
+</body>
+
+</html>

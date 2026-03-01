@@ -88,7 +88,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0a0a;color:#fff}
 <button class="btn" onclick="toggleFS()">Fullscreen</button>
 </div>
 </div>
-<div class="ticker"><div class="ticker-content"><span class="hl">CCTV Dinas Komunikasi dan Informatika Kab. Konawe</span> - Sistem Pemantauan Real-Time - Labkesda - Dinsos - Asambu - Kel. Unaaha - Pasar Asinua - Asinua - Inalahi - Uepai - <span class="hl">Total 18 Kamera</span></div></div>
+<div class="ticker"><div class="ticker-content"><span class="hl">CCTV Dinas Komunikasi dan Informatika Kab. Konawe</span> - Sistem Pemantauan Real-Time - Labkesda - Dinsos - Asambu - Kel. Unaaha - Pasar Asinua - Asinua - Inalahi - <span class="hl">Total 14 Kamera</span></div></div>
 <div class="main">
 <div class="grid-wrap">
 <div id="grid" class="grid grid-2x2"></div>
@@ -104,7 +104,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0a0a;color:#fff}
 <div class="sb-section"><div class="sb-title">KAMERA</div><div class="sb-list" id="cam-list"></div></div>
 </div>
 </div>
-<div class="footer"><div>Online: <span id="cnt">0</span>/18</div><div>Diskominfo Kab. Konawe 2026</div></div>
+<div class="footer"><div>Online: <span id="cnt">0</span>/14</div><div>Diskominfo Kab. Konawe 2026</div></div>
 </div>
 <script>
 var API='http://36.93.71.27:1984';
@@ -122,10 +122,10 @@ var cams=[
 {id:'asinua1',name:'Asinua 1',grp:'Asinua',on:true,bw:0},
 {id:'asinua2',name:'Asinua 2',grp:'Asinua',on:true,bw:0},
 {id:'inalahi1',name:'Inalahi 1',grp:'Inalahi',on:true,bw:0},
-{id:'inalahi2',name:'Inalahi 2',grp:'Inalahi',on:true,bw:0},
-{id:'uepai1',name:'Uepai 1',grp:'Uepai',on:true,bw:0},{id:'unilaki1',name:'Unilaki 1',grp:'Unilaki',on:true,bw:0},{id:'uepai2',name:'Uepai 2',grp:'Uepai',on:true,bw:0},{id:'unilaki2',name:'Unilaki 2',grp:'Unilaki',on:true,bw:0}
+{id:'inalahi2',name:'Inalahi 2',grp:'Inalahi',on:true,bw:0}
+ {id:'uepai1',name:'Uepai',grp:'Uepai',on:true,bw:0},
 ];
-var players={},layout='2x2',counts={'1x1':1,'2x2':4,'3x3':9,'4x4':16},online=0;
+var players={},layout='2x2',counts={'1x1':1,'2x2':4,'3x3':9,'4x4':14},online=0;
 var currentPage=0;
 
 function updateClock(){

@@ -1,0 +1,271 @@
+/* CCTV Dashboard - Flask Version */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    min-height: 100vh;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-bottom: 1px solid #0f3460;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header h1 {
+    font-size: 1.2rem;
+    color: #00d9ff;
+}
+
+.layout-btns {
+    display: flex;
+    gap: 5px;
+}
+
+.btn {
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover,
+.btn.active {
+    background: #00d9ff;
+    color: #000;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.clock {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00d9ff;
+}
+
+.date {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.online-count {
+    background: rgba(0, 217, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+}
+
+/* Ticker */
+.ticker {
+    background: #16213e;
+    padding: 8px 0;
+    overflow: hidden;
+}
+
+.ticker-content {
+    animation: scroll 30s linear infinite;
+    white-space: nowrap;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.hl {
+    color: #00d9ff;
+    font-weight: bold;
+}
+
+/* Main Grid */
+.main {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.grid {
+    display: grid;
+    gap: 10px;
+    height: auto;
+}
+
+.grid-2x2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.grid-3x3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4x4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-5x5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+/* Camera Box */
+.cam-box {
+    position: relative;
+    background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    min-height: 120px;
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cam-box:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 217, 255, 0.2);
+    border-color: rgba(0, 217, 255, 0.5);
+}
+
+.cam-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cam-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.cam-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cam-name {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.cam-group {
+    font-size: 10px;
+    color: #888;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    background: #00c853;
+}
+
+.badge.loading {
+    background: #ff9800;
+}
+
+.badge.error {
+    background: #f44336;
+}
+
+/* Controls */
+.cam-controls {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.cam-box:hover .cam-controls {
+    opacity: 1;
+}
+
+.ctrl-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.ctrl-btn:hover {
+    background: #00d9ff;
+}
+
+/* Footer */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: #111;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Public Mode Overrides */
+.public-mode .cam-box {
+    min-height: 100px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .grid-2x2,
+    .grid-3x3,
+    .grid-4x4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

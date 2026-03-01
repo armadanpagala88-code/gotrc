@@ -1,19 +1,63 @@
+# go2rtc RTSP Proxy Configuration
+# Semua akses CCTV melalui satu server (port 8554)
+# Stream utama = stream1 (High Quality 2K/1080p)
+# Stream _sub = stream2 (Low Quality HD/720p)
+# ALL STREAMS USING FFmpeg TRANSCODE H.265+ -> H.264
+
 streams:
-  labkesda1: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:554/stream2#timeout=30"
-  labkesda2: "rtsp://admin:2025-CCTVknw@modem-labkesda.ddns.net:555/stream2#timeout=30"
-  sosial1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream2#video=h264"
-  sosial2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream2#video=h264"
-  asambu1: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream2#timeout=30"
-  asambu2: "rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream2#timeout=30"
-  unaaha1: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream2#timeout=30"
-  unaaha2: "rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream2#timeout=30"
-  pasar_asinua1: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream2#timeout=30"
-  pasar_asinua2: "rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream2#timeout=30"
-  asinua1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream2#video=h264"
-  asinua2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream2#video=h264"
-  inalahi1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream2#video=h264"
-  inalahi2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream2#video=h264"
+  # LABKESDA - H.265+ with FFmpeg transcode
+  labkesda1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-labkesda2.ddns.net:6554/stream1#video=h264"
+  labkesda2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-labkesda2.ddns.net:6555/stream1#video=h264"
+  labkesda1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-labkesda2.ddns.net:6554/stream2#video=h264"
+  labkesda2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-labkesda2.ddns.net:6555/stream2#video=h264"
+  
+  # DINSOS/SOSIAL - H.265+ with FFmpeg transcode
+  sosial1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream1#video=h264"
+  sosial2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream1#video=h264"
+  sosial1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6559/stream2#video=h264"
+  sosial2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-dinsos.ddns.net:6560/stream2#video=h264"
+  
+  # ASAMBU - H.265+ with FFmpeg transcode
+  asambu1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream1#video=h264"
+  asambu2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream1#video=h264"
+  asambu1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6559/stream2#video=h264"
+  asambu2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asambu.ddns.net:6560/stream2#video=h264"
+  
+  # KEL. UNAAHA - H.265+ with FFmpeg transcode
+  unaaha1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream1#video=h264"
+  unaaha2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream1#video=h264"
+  unaaha1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6559/stream2#video=h264"
+  unaaha2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-kelunaaha.ddns.net:6560/stream2#video=h264"
+  
+  # PASAR ASINUA - H.265+ with FFmpeg transcode
+  pasar_asinua1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream1#video=h264"
+  pasar_asinua2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream1#video=h264"
+  pasar_asinua1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6552/stream2#video=h264"
+  pasar_asinua2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-pasarasinua.ddns.net:6551/stream2#video=h264"
+  
+  # ASINUA - H.265+ with FFmpeg transcode
+  asinua1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream1#video=h264"
+  asinua2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream1#video=h264"
+  asinua1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6555/stream2#video=h264"
+  asinua2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-asinua.ddns.net:6551/stream2#video=h264"
+  
+  # INALAHI - H.265+ with FFmpeg transcode
+  inalahi1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream1#video=h264"
+  inalahi2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream1#video=h264"
+  inalahi1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6550/stream2#video=h264"
+  inalahi2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-inalahi.ddns.net:6551/stream2#video=h264"
+  
+  # UEPAI - H.265+ with FFmpeg transcode
   uepai1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-uepai.ddns.net:6550/stream1#video=h264"
+  uepai2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-uepai.ddns.net:6551/stream1#video=h264"
+  uepai1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-uepai.ddns.net:6550/stream2#video=h264"
+  uepai2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-uepai.ddns.net:6551/stream2#video=h264"
+  
+  # UNILAKI - H.265+ with FFmpeg transcode
+  unilaki1: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-unilaki.ddns.net:6655/stream1#video=h264"
+  unilaki2: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-unilaki.ddns.net:6656/stream1#video=h264"
+  unilaki1_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-unilaki.ddns.net:6655/stream2#video=h264"
+  unilaki2_sub: "ffmpeg:rtsp://admin:2025-CCTVknw@cctv-unilaki.ddns.net:6656/stream2#video=h264"
 
 ffmpeg:
   bin: ffmpeg
@@ -21,11 +65,11 @@ ffmpeg:
 api:
   listen: ":1984"
   origin: "*"
-  static_dir: /config
+  static_dir: /static
 
 rtsp:
   listen: ":8554"
-  default_query: "timeout=5"
+  default_query: "video&audio"
 
 webrtc:
   listen: ":8555/tcp"
@@ -35,7 +79,6 @@ webrtc:
 hls:
   segment_duration: 1
   playlist_size: 3
-  part_duration: 0.5
 
 log:
   level: info
