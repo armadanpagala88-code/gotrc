@@ -786,12 +786,18 @@
 
         /* --- Popup Video --- */
         .popup-video {
-            width: 240px;
-            height: 135px;
+            width: 640px;
+            height: 360px;
             background: #000;
-            border-radius: 4px;
-            margin-top: 6px;
+            border-radius: 6px;
+            margin-top: 8px;
             display: block
+        }
+
+        .popup-lokasi {
+            font-size: 10px;
+            color: #0ea5e9;
+            margin-top: 2px
         }
 
         .popup-vid-label {
@@ -893,8 +899,9 @@
             </div>
             <div class="header-right">
                 <div class="tab-bar">
-                    <button class="tab-btn active" id="tab-cctv" onclick="switchTab('cctv')">🎥 CCTV</button>
-                    <button class="tab-btn" id="tab-webgis" onclick="switchTab('webgis')">🗺️ Peta Lokasi</button>
+                    <button class="tab-btn" id="tab-cctv" onclick="switchTab('cctv')">🎥 CCTV</button>
+                    <button class="tab-btn active" id="tab-webgis" onclick="switchTab('webgis')">🗺️ Peta
+                        Lokasi</button>
                 </div>
                 <button class="btn active" id="btn-sd" onclick="setQuality('sd')">SD</button>
                 <button class="btn" id="btn-hd" onclick="setQuality('hd')">HD</button>
@@ -914,7 +921,7 @@
         </div>
         <div class="main">
             <!-- CCTV Tab -->
-            <div class="cctv-wrap" id="cctv-wrap">
+            <div class="cctv-wrap hidden" id="cctv-wrap">
                 <div class="grid-wrap">
                     <div id="grid" class="grid grid-2x2"></div>
                     <div class="pagination" id="pagination">
@@ -938,7 +945,7 @@
                 </div>
             </div>
             <!-- WebGIS Tab -->
-            <div class="webgis-wrap" id="webgis-wrap">
+            <div class="webgis-wrap active" id="webgis-wrap">
                 <div class="pick-banner" id="pick-banner">
                     📍 Klik pada peta untuk memilih lokasi — <span id="pick-cam-name"></span>
                     <button class="pick-cancel" onclick="cancelPickMode()">✕ Batal</button>
@@ -949,8 +956,9 @@
                     <span><span class="legend-dot" style="background:#ef4444"></span>Offline</span>
                     <span><span class="legend-dot" style="background:#eab308"></span>Loading</span>
                     <span style="margin-left:8px" class="layer-toggle">
-                        <button class="layer-btn active" id="btn-dark" onclick="setBaseLayer('dark')">🌑 Dark</button>
-                        <button class="layer-btn" id="btn-sat" onclick="setBaseLayer('satellite')">🛰️ Satelit</button>
+                        <button class="layer-btn" id="btn-dark" onclick="setBaseLayer('dark')">🌑 Dark</button>
+                        <button class="layer-btn active" id="btn-sat" onclick="setBaseLayer('satellite')">🛰️
+                            Satelit</button>
                     </span>
                     <button class="layer-btn"
                         style="margin-left:8px;background:#1a1a2e;color:#eab308;border-color:#eab308"
@@ -980,7 +988,7 @@
         var API = 'http://36.93.71.27:1984';
 
         /* ===== TAB SWITCHING ===== */
-        var activeTab = 'cctv';
+        var activeTab = 'webgis';
         var mapInstance = null;
         var mapInitialized = false;
 
@@ -995,30 +1003,31 @@
             } else if (tab === 'webgis' && mapInitialized) {
                 mapInstance.invalidateSize();
             }
+            if (tab === 'cctv') { render(); }
         }
 
         /* ===== WEBGIS MAP ===== */
 
         // Default camera locations
         var defaultCamLocations = [
-            { id: 'labkesda1', name: 'Labkesda 1', grp: 'Labkesda', lat: -3.9747, lng: 122.5178 },
-            { id: 'labkesda2', name: 'Labkesda 2', grp: 'Labkesda', lat: -3.9749, lng: 122.5180 },
-            { id: 'sosial1', name: 'Sosial 1', grp: 'Dinsos', lat: -3.9762, lng: 122.5160 },
-            { id: 'sosial2', name: 'Sosial 2', grp: 'Dinsos', lat: -3.9764, lng: 122.5162 },
-            { id: 'asambu1', name: 'Asambu 1', grp: 'Asambu', lat: -3.9810, lng: 122.5120 },
-            { id: 'asambu2', name: 'Asambu 2', grp: 'Asambu', lat: -3.9812, lng: 122.5122 },
-            { id: 'unaaha1', name: 'Kel. Unaaha 1', grp: 'Kel. Unaaha', lat: -3.9860, lng: 122.5190 },
-            { id: 'unaaha2', name: 'Kel. Unaaha 2', grp: 'Kel. Unaaha', lat: -3.9855, lng: 122.5185 },
-            { id: 'pasar_asinua1', name: 'Pasar Asinua 1', grp: 'Pasar Asinua', lat: -3.9920, lng: 122.5230 },
-            { id: 'pasar_asinua2', name: 'Pasar Asinua 2', grp: 'Pasar Asinua', lat: -3.9922, lng: 122.5232 },
-            { id: 'asinua1', name: 'Asinua 1', grp: 'Asinua', lat: -3.9950, lng: 122.5260 },
-            { id: 'asinua2', name: 'Asinua 2', grp: 'Asinua', lat: -3.9952, lng: 122.5262 },
-            { id: 'inalahi1', name: 'Inalahi 1', grp: 'Inalahi', lat: -4.0100, lng: 122.5350 },
-            { id: 'inalahi2', name: 'Inalahi 2', grp: 'Inalahi', lat: -4.0102, lng: 122.5352 },
-            { id: 'uepai1', name: 'Uepai 1', grp: 'Uepai', lat: -3.9680, lng: 122.5100 },
-            { id: 'uepai2', name: 'Uepai 2', grp: 'Uepai', lat: -3.9682, lng: 122.5102 },
-            { id: 'unilaki1', name: 'Unilaki 1', grp: 'Unilaki', lat: -3.9720, lng: 122.5140 },
-            { id: 'unilaki2', name: 'Unilaki 2', grp: 'Unilaki', lat: -3.9722, lng: 122.5142 }
+            { id: 'labkesda1', name: 'Labkesda 1', grp: 'Labkesda', lat: -3.9747, lng: 122.5178, lokasi: 'Jl. Sapati, Kel. Unaaha' },
+            { id: 'labkesda2', name: 'Labkesda 2', grp: 'Labkesda', lat: -3.9749, lng: 122.5180, lokasi: 'Jl. Sapati, Kel. Unaaha' },
+            { id: 'sosial1', name: 'Sosial 1', grp: 'Dinsos', lat: -3.9762, lng: 122.5160, lokasi: 'Kantor Dinsos Konawe' },
+            { id: 'sosial2', name: 'Sosial 2', grp: 'Dinsos', lat: -3.9764, lng: 122.5162, lokasi: 'Kantor Dinsos Konawe' },
+            { id: 'asambu1', name: 'Asambu 1', grp: 'Asambu', lat: -3.9810, lng: 122.5120, lokasi: 'Kel. Asambu, Kec. Unaaha' },
+            { id: 'asambu2', name: 'Asambu 2', grp: 'Asambu', lat: -3.9812, lng: 122.5122, lokasi: 'Kel. Asambu, Kec. Unaaha' },
+            { id: 'unaaha1', name: 'Kel. Unaaha 1', grp: 'Kel. Unaaha', lat: -3.9860, lng: 122.5190, lokasi: 'Kel. Unaaha, Kec. Unaaha' },
+            { id: 'unaaha2', name: 'Kel. Unaaha 2', grp: 'Kel. Unaaha', lat: -3.9855, lng: 122.5185, lokasi: 'Kel. Unaaha, Kec. Unaaha' },
+            { id: 'pasar_asinua1', name: 'Pasar Asinua 1', grp: 'Pasar Asinua', lat: -3.9920, lng: 122.5230, lokasi: 'Pasar Asinua, Kec. Unaaha' },
+            { id: 'pasar_asinua2', name: 'Pasar Asinua 2', grp: 'Pasar Asinua', lat: -3.9922, lng: 122.5232, lokasi: 'Pasar Asinua, Kec. Unaaha' },
+            { id: 'asinua1', name: 'Asinua 1', grp: 'Asinua', lat: -3.9950, lng: 122.5260, lokasi: 'Kel. Asinua, Kec. Unaaha' },
+            { id: 'asinua2', name: 'Asinua 2', grp: 'Asinua', lat: -3.9952, lng: 122.5262, lokasi: 'Kel. Asinua, Kec. Unaaha' },
+            { id: 'inalahi1', name: 'Inalahi 1', grp: 'Inalahi', lat: -4.0100, lng: 122.5350, lokasi: 'Kel. Inalahi, Kec. Unaaha' },
+            { id: 'inalahi2', name: 'Inalahi 2', grp: 'Inalahi', lat: -4.0102, lng: 122.5352, lokasi: 'Kel. Inalahi, Kec. Unaaha' },
+            { id: 'uepai1', name: 'Uepai 1', grp: 'Uepai', lat: -3.9680, lng: 122.5100, lokasi: 'Kel. Uepai, Kec. Unaaha' },
+            { id: 'uepai2', name: 'Uepai 2', grp: 'Uepai', lat: -3.9682, lng: 122.5102, lokasi: 'Kel. Uepai, Kec. Unaaha' },
+            { id: 'unilaki1', name: 'Unilaki 1', grp: 'Unilaki', lat: -3.9720, lng: 122.5140, lokasi: 'Kel. Unilaki, Kec. Unaaha' },
+            { id: 'unilaki2', name: 'Unilaki 2', grp: 'Unilaki', lat: -3.9722, lng: 122.5142, lokasi: 'Kel. Unilaki, Kec. Unaaha' }
         ];
 
         // Load saved or use defaults
@@ -1034,7 +1043,7 @@
 
         /* --- Base Layer Toggle --- */
         var baseLayers = {};
-        var currentBaseLayer = 'dark';
+        var currentBaseLayer = 'satellite';
 
         function setBaseLayer(name) {
             if (!mapInitialized) return;
@@ -1077,11 +1086,13 @@
         }
 
         function buildPopupHtml(loc, statusClass, statusLabel) {
+            var lokasiText = loc.lokasi || '-';
             return '<div class="popup-name">📷 ' + loc.name + '</div>' +
                 '<div class="popup-grp">' + loc.grp + '</div>' +
+                '<div class="popup-lokasi">📍 ' + lokasiText + '</div>' +
                 '<div style="font-size:10px;color:#666">📌 ' + parseFloat(loc.lat).toFixed(5) + ', ' + parseFloat(loc.lng).toFixed(5) + '</div>' +
                 '<span class="popup-status ' + statusClass + '">' + statusLabel + '</span>' +
-                '<br><video id="popup-v-' + loc.id + '" class="popup-video" muted autoplay playsinline controls></video>' +
+                '<video id="popup-v-' + loc.id + '" class="popup-video" muted autoplay playsinline controls></video>' +
                 '<div class="popup-vid-label">Stream langsung • SD quality</div>';
         }
 
@@ -1105,14 +1116,19 @@
                 center: [-3.985, 122.518],
                 zoom: 13,
                 zoomControl: true,
-                layers: [baseLayers['dark']]
+                layers: [baseLayers['satellite']]
             });
+
+            // Labels overlay (shows kecamatan, kelurahan, jalan names on top of satellite)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd', maxZoom: 20, pane: 'overlayPane', opacity: 0.9
+            }).addTo(mapInstance);
 
             // Place markers
             for (var i = 0; i < camLocations.length; i++) {
                 (function (loc) {
                     var marker = L.marker([loc.lat, loc.lng], { icon: makeMarker('#eab308') }).addTo(mapInstance);
-                    var popup = L.popup({ maxWidth: 280, minWidth: 260, className: 'cctv-popup' })
+                    var popup = L.popup({ maxWidth: 700, minWidth: 660, className: 'cctv-popup' })
                         .setContent(buildPopupHtml(loc, '', 'Loading'));
                     marker.bindPopup(popup);
                     marker.on('popupopen', function () {
@@ -1162,6 +1178,8 @@
                     '<div><div class="crud-name">📷 ' + loc.name + '</div>' +
                     '<div class="crud-grp">' + loc.grp + '</div></div>' +
                     '</div>' +
+                    '<div class="crud-input-wrap" style="margin-bottom:4px"><label>Lokasi / Alamat</label>' +
+                    '<input type="text" id="lok-' + loc.id + '" value="' + (loc.lokasi || '') + '" placeholder="Nama jalan / kelurahan" style="width:100%"></div>' +
                     '<div class="crud-inputs">' +
                     '<div class="crud-input-wrap"><label>Latitude</label>' +
                     '<input type="number" step="0.00001" id="lat-' + loc.id + '" value="' + loc.lat + '"></div>' +
@@ -1181,14 +1199,17 @@
         function saveOneCoord(id) {
             var latEl = document.getElementById('lat-' + id);
             var lngEl = document.getElementById('lng-' + id);
+            var lokEl = document.getElementById('lok-' + id);
             if (!latEl || !lngEl) return;
             var lat = parseFloat(latEl.value);
             var lng = parseFloat(lngEl.value);
+            var lokasi = lokEl ? lokEl.value.trim() : '';
             if (isNaN(lat) || isNaN(lng)) { alert('Koordinat tidak valid!'); return; }
             for (var i = 0; i < camLocations.length; i++) {
                 if (camLocations[i].id === id) {
                     camLocations[i].lat = lat;
                     camLocations[i].lng = lng;
+                    camLocations[i].lokasi = lokasi;
                     break;
                 }
             }
@@ -1196,6 +1217,10 @@
                 mapMarkers[id].marker.setLatLng([lat, lng]);
                 mapMarkers[id].loc.lat = lat;
                 mapMarkers[id].loc.lng = lng;
+                mapMarkers[id].loc.lokasi = lokasi;
+                // Update popup content
+                var popup = mapMarkers[id].marker.getPopup();
+                if (popup) popup.setContent(buildPopupHtml(mapMarkers[id].loc, '', 'Loading'));
             }
             localStorage.setItem('cctv_locations', JSON.stringify(camLocations));
             var row = document.getElementById('crud-' + id);
@@ -1524,6 +1549,8 @@
         }
         setInterval(fetchBW, 3000);
         render();
+        // Auto-init map since WebGIS is default tab
+        setTimeout(function () { if (!mapInitialized) initMap(); }, 100);
     </script>
 </body>
 
